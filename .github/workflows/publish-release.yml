@@ -82,5 +82,6 @@ jobs:
             $env:BLOCKMAP `
             "staging\latest.yml" `
             --repo "TheIsleAE3Mien/TheIsleLauncher-Releases" `
+            --target main `
             --title "TheIsleLauncher $env:VERSION" `
             --notes-file $notes
