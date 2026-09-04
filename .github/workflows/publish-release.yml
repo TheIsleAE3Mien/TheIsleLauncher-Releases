@@ -1,0 +1,86 @@
+name: Publish Launcher release
+
+on:
+  push:
+    branches: [publish]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-launcher-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate and rebuild installer
+        id: release
+        shell: pwsh
+        run: |
+          $manifest = Get-Content -LiteralPath "release-manifest.json" -Raw | ConvertFrom-Json
+          if ($manifest.schemaVersion -ne 1) { throw "Unsupported release manifest" }
+          if ($manifest.sourceRepository -ne "TheIsleAE3Mien/TheIsleLauncher") { throw "Unexpected source repository" }
+          if ($manifest.version -notmatch '^0\.[0-9]{6}\.[1-9][0-9]*$') { throw "Invalid release version" }
+          if ($manifest.tag -ne "v$($manifest.version)") { throw "Invalid release tag" }
+          if ($manifest.sourceCommit -notmatch '^[0-9a-f]{40}$') { throw "Invalid source commit" }
+          if ($manifest.installer -ne "TheIsleLauncher-$($manifest.version)-Setup.exe") { throw "Invalid installer name" }
+          if ($manifest.installerSha256 -notmatch '^[0-9A-F]{64}$') { throw "Invalid installer hash" }
+          if ($manifest.partCount -lt 1 -or $manifest.partCount -gt 20) { throw "Invalid part count" }
+
+          $parts = @(Get-ChildItem -LiteralPath "staging" -File -Filter "$($manifest.installer).part-*" | Sort-Object Name)
+          if ($parts.Count -ne $manifest.partCount) { throw "Release part count mismatch" }
+          if ($parts | Where-Object Length -gt 90MB) { throw "Release part exceeds GitHub file limit" }
+
+          $installerPath = Join-Path $env:RUNNER_TEMP $manifest.installer
+          $output = [IO.File]::Create($installerPath)
+          try {
+            foreach ($part in $parts) {
+              $input = [IO.File]::OpenRead($part.FullName)
+              try { $input.CopyTo($output) } finally { $input.Dispose() }
+            }
+          } finally {
+            $output.Dispose()
+          }
+
+          $actualHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash
+          if ($actualHash -ne $manifest.installerSha256) { throw "Installer hash mismatch" }
+          $latest = Get-Content -LiteralPath "staging\latest.yml" -Raw
+          if ($latest -notmatch "(?m)^version:\s*$([regex]::Escape($manifest.version))\s*$") { throw "latest.yml version mismatch" }
+          if ($latest -notmatch [regex]::Escape($manifest.installer)) { throw "latest.yml installer mismatch" }
+          $blockmapPath = "staging\$($manifest.installer).blockmap"
+          if (-not (Test-Path -LiteralPath $blockmapPath -PathType Leaf)) { throw "Missing blockmap" }
+
+          "installer=$installerPath" >> $env:GITHUB_OUTPUT
+          "blockmap=$blockmapPath" >> $env:GITHUB_OUTPUT
+          "tag=$($manifest.tag)" >> $env:GITHUB_OUTPUT
+          "version=$($manifest.version)" >> $env:GITHUB_OUTPUT
+          "commit=$($manifest.sourceCommit)" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INSTALLER: ${{ steps.release.outputs.installer }}
+          BLOCKMAP: ${{ steps.release.outputs.blockmap }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+          SOURCE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          $notes = Join-Path $env:RUNNER_TEMP "release-notes.md"
+          @"
+          Automated Windows build from private TheIsleLauncher commit ``$env:SOURCE_COMMIT``.
+
+          Download the Setup executable below. The Launcher uses this release as its public auto-update feed.
+          "@ | Set-Content -LiteralPath $notes -Encoding utf8
+          gh release create $env:TAG `
+            $env:INSTALLER `
+            $env:BLOCKMAP `
+            "staging\latest.yml" `
+            --repo "TheIsleAE3Mien/TheIsleLauncher-Releases" `
+            --title "TheIsleLauncher $env:VERSION" `
+            --notes-file $notes
