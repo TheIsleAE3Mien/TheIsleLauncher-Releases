@@ -1,8 +1,8 @@
-version: 0.260904.301
+version: 0.260905.401
 files:
-  - url: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/download/v0.260904.301/TheIsleLauncher-Setup.exe
-    sha512: uAzc9MmC+qlF5+8ueVR3hLJLh5BfRrPOsCnrgGNF4WrKrO7NSoBczRI25mk7kaOoBxOACT/158LaCQ+f9mvFZw==
-    size: 105933463
-path: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/download/v0.260904.301/TheIsleLauncher-Setup.exe
-sha512: uAzc9MmC+qlF5+8ueVR3hLJLh5BfRrPOsCnrgGNF4WrKrO7NSoBczRI25mk7kaOoBxOACT/158LaCQ+f9mvFZw==
-releaseDate: '2026-09-04T22:43:19.890Z'
+  - url: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/download/v0.260905.401/TheIsleLauncher-Setup.exe
+    sha512: yPn3Er0PcLPmqtYIbo9BJNKP95W7N0gYQiJtDXHR3enQhbB4Xyos6ZZazG8XIygIv27CYtdMuutE+RbbGgjw4Q==
+    size: 105943233
+path: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/download/v0.260905.401/TheIsleLauncher-Setup.exe
+sha512: yPn3Er0PcLPmqtYIbo9BJNKP95W7N0gYQiJtDXHR3enQhbB4Xyos6ZZazG8XIygIv27CYtdMuutE+RbbGgjw4Q==
+releaseDate: '2026-09-05T15:48:57.665Z'
