@@ -1,9 +1,9 @@
-version: 1.4.1
+version: 1.4.2
 files:
   - url: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/latest/download/TheIsleLauncher-Setup.exe
-    sha512: l01yKZTa3fjrlMn85uhTTmVl6piJ/zXr+iAsY3p/gjD/B7TAEf4MrdgbUoR7nLipnfVoSp7Muz7rZ+0NNn+UXg==
-    size: 127268048
+    sha512: IP77dRSoheV/s5DeuuSdyhSxp93zkSN5S4cHnlNSVi9+tEx4HryQ45uu9x4A9i5gpLjJTZIdT5kaWHDo95bqwQ==
+    size: 127558822
     isAdminRightsRequired: true
 path: https://github.com/TheIsleAE3Mien/TheIsleLauncher-Releases/releases/latest/download/TheIsleLauncher-Setup.exe
-sha512: l01yKZTa3fjrlMn85uhTTmVl6piJ/zXr+iAsY3p/gjD/B7TAEf4MrdgbUoR7nLipnfVoSp7Muz7rZ+0NNn+UXg==
-releaseDate: '2026-10-10T05:05:13.181Z'
+sha512: IP77dRSoheV/s5DeuuSdyhSxp93zkSN5S4cHnlNSVi9+tEx4HryQ45uu9x4A9i5gpLjJTZIdT5kaWHDo95bqwQ==
+releaseDate: '2026-10-10T09:30:38.813Z'
